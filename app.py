@@ -6,7 +6,7 @@ class Query(BaseModel):
     question: str
 
 # Ajouter votre clé API OpenAI
-openai.api_key = "YOUR_API_KEY"
+openai.api_key = "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"
 
 # Définir les paramètres pour GPT-3
 model_engine = "text-davinci-002"
