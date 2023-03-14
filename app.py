@@ -1,55 +1,39 @@
-import os
 import openai
-import gradio as gr
+import streamlit as st
+from pydantic import BaseModel
 
-#if you have OpenAI API key as an environment variable, enable the below
-#openai.api_key = os.getenv("OPENAI_API_KEY")
+class Query(BaseModel):
+    question: str
 
-#if you have OpenAI API key as a string, enable the below
-openai.api_key = "xxxxxx"
+# Ajouter votre clé API OpenAI
+openai.api_key = "YOUR_API_KEY"
 
-start_sequence = "\nAI:"
-restart_sequence = "\nHuman: "
+# Définir les paramètres pour GPT-3
+model_engine = "text-davinci-002"
+temperature = 0.5
+max_tokens = 100
 
-prompt = "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.\n\nHuman: Hello, who are you?\nAI: I am an AI created by OpenAI. How can I help you today?\nHuman: "
+# Créer l'interface utilisateur avec Streamlit
+def main():
+    st.title("Bot GPT-3")
 
-def openai_create(prompt):
+    query = Query(question="")
+    query.question = st.text_input("Posez votre question :")
 
+    if st.button("Répondre"):
+        response = generate_response(query.question)
+        st.write(response)
+
+# Définir une fonction pour générer une réponse à partir de GPT-3
+def generate_response(question):
+    prompt = f"Q: {question}\nA:"
     response = openai.Completion.create(
-    model="text-davinci-003",
-    prompt=prompt,
-    temperature=0.9,
-    max_tokens=150,
-    top_p=1,
-    frequency_penalty=0,
-    presence_penalty=0.6,
-    stop=[" Human:", " AI:"]
+        engine=model_engine,
+        prompt=prompt,
+        temperature=temperature,
+        max_tokens=max_tokens
     )
-
     return response.choices[0].text
 
-
-
-def chatgpt_clone(input, history):
-    history = history or []
-    s = list(sum(history, ()))
-    s.append(input)
-    inp = ' '.join(s)
-    output = openai_create(inp)
-    history.append((input, output))
-    return history, history
-
-
-block = gr.Blocks()
-
-
-with block:
-    gr.Markdown("""<h1><center>Build Yo'own ChatGPT with OpenAI API & Gradio</center></h1>
-    """)
-    chatbot = gr.Chatbot()
-    message = gr.Textbox(placeholder=prompt)
-    state = gr.State()
-    submit = gr.Button("SEND")
-    submit.click(chatgpt_clone, inputs=[message, state], outputs=[chatbot, state])
-
-block.launch(debug = True)
+if __name__ == "__main__":
+    main()
