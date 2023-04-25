@@ -2,7 +2,7 @@ import openai
 import streamlit as st
 
 # Ajouter votre clé API OpenAI
-openai.api_key = "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"
+openai.api_key = "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"
 
 # Définir les paramètres pour GPT-3
 model_engine = "text-davinci-002"
